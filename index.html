@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080A0D">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Lusso Bistro & Bar | Bar Cost & Stok Yönetim Modülü</title>
+    
+    <!-- Google Fonts: Luxury Serif & Modern Clean Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js for Luxury Dark Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Custom Luxury Dark & Gold Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- ============================================================
+             1. HEADER: Brand Logo, Clock, Module Badge & Quick Actions
+             ============================================================ -->
+        <header class="main-header">
+            <div class="brand-section">
+                <div class="brand-logo-badge" title="Lusso Bistro & Bar Luxury Operations">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8 22h8"/>
+                        <path d="M12 11v11"/>
+                        <path d="m19 3-7 8-7-8Z"/>
+                    </svg>
+                </div>
+                <div class="brand-info">
+                    <h1 class="serif-title gold-text-gradient">LUSSO BISTRO &amp; BAR</h1>
+                    <div class="brand-tagline">
+                        <span>Kokteyl Lounge &amp; Fine Dining</span>
+                        <span style="color: var(--gold-500);">•</span>
+                        <span class="module-pill">Cost &amp; Stok Yönetim Modülü</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Digital Clock & Shift Status -->
+            <div class="header-status-center">
+                <div class="live-clock-card">
+                    <div class="clock-icon-wrap">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <div class="clock-data">
+                        <span class="clock-time" id="liveTime">22:00:00</span>
+                        <span class="clock-date" id="liveDate">Yükleniyor...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Action Buttons -->
+            <div class="header-actions">
+                <button class="btn btn-gold" id="btnOpenGuideTab" title="Sistemin kullanımını adım adım öğrenin">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                    </svg>
+                    Nasıl Kullanılır? (Rehber)
+                </button>
+                <button class="btn btn-secondary" id="btnOpenAddModal">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    + Yeni Kokteyl
+                </button>
+                <button class="btn btn-secondary" id="btnExportCSV" title="Maliyet Tablosunu Excel/CSV olarak indir">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    CSV İndir
+                </button>
+                <button class="btn btn-secondary" id="btnPrintReport" title="Vardiya Sonu Maliyet Raporunu Yazdır">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 6 2 18 2 18 9"/>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                        <rect width="12" height="8" x="6" y="14"/>
+                    </svg>
+                    Yazdır
+                </button>
+            </div>
+        </header>
+
+        <!-- ============================================================
+             2. KPI SUMMARY CARDS (Kritik Özet Metrikler)
+             ============================================================ -->
+        <section class="kpi-grid">
+            <!-- KPI 1: Hedef İçecek Maliyeti -->
+            <div class="kpi-card gold-accent">
+                <div class="kpi-top">
+                    <span class="kpi-title">Hedef İçecek Maliyeti (F&amp;B Cost %)</span>
+                    <div class="kpi-icon-wrap">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value-row">
+                    <span class="kpi-value" id="kpiTargetCost">%23.4</span>
+                    <span class="kpi-badge badge-gold" id="kpiCostBadge">İdeal Aralık (%20-%25)</span>
+                </div>
+                <div class="kpi-progress-track">
+                    <div class="kpi-progress-fill" style="width: 23.4%;"></div>
+                </div>
+                <div class="kpi-subtext">
+                    <span>Lusso Hedefi: %22.0</span>
+                    <span style="color: var(--emerald-400);">Dengeli &amp; Karlı</span>
+                </div>
+            </div>
+
+            <!-- KPI 2: Günlük Tahmini Zayiat Oranı -->
+            <div class="kpi-card emerald-accent">
+                <div class="kpi-top">
+                    <span class="kpi-title">Günlük Tahmini Zayiat Oranı</span>
+                    <div class="kpi-icon-wrap" style="color: var(--emerald-400);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v20"/>
+                            <path d="m17 5-5-3-5 3"/>
+                            <path d="m17 19-5 3-5-3"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value-row">
+                    <span class="kpi-value" id="kpiWasteRate">%1.2</span>
+                    <span class="kpi-badge badge-success">Düşük / Güvenli Bölge</span>
+                </div>
+                <div class="kpi-progress-track">
+                    <div class="kpi-progress-fill" style="width: 15%; background: var(--emerald-500);"></div>
+                </div>
+                <div class="kpi-subtext">
+                    <span>Toplam Zayiat Kaybı:</span>
+                    <strong style="color: var(--rose-400);" id="kpiWasteCostSum">227,30 ₺</strong>
+                </div>
+            </div>
+
+            <!-- KPI 3: Aktif İmza Kokteyller -->
+            <div class="kpi-card amber-accent">
+                <div class="kpi-top">
+                    <span class="kpi-title">Aktif İmza Kokteyl Menüsü</span>
+                    <div class="kpi-icon-wrap" style="color: var(--amber-400);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m8 2 4 4-4 4"/>
+                            <path d="M12 6H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value-row">
+                    <span class="kpi-value" id="kpiCocktailCount">6</span>
+                    <span class="kpi-unit">Adet</span>
+                    <span class="kpi-badge badge-gold">Mevsimlik Koleksiyon</span>
+                </div>
+                <div class="kpi-progress-track">
+                    <div class="kpi-progress-fill" style="width: 100%; background: var(--amber-500);"></div>
+                </div>
+                <div class="kpi-subtext">
+                    <span>Ortalama Kâr Marjı:</span>
+                    <strong style="color: var(--emerald-400);" id="kpiAvgMargin">%82.4</strong>
+                </div>
+            </div>
+
+            <!-- KPI 4: Günlük Ortalama Ciro & Hacim -->
+            <div class="kpi-card blue-accent">
+                <div class="kpi-top">
+                    <span class="kpi-title">Tahmini Günlük Kokteyl Cirosu</span>
+                    <div class="kpi-icon-wrap" style="color: var(--blue-400);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-value-row">
+                    <span class="kpi-value" style="font-size: 1.85rem;" id="kpiDailyRevenue">136.200 ₺</span>
+                    <span class="kpi-badge badge-success">+18% Hedef Üstü</span>
+                </div>
+                <div class="kpi-progress-track">
+                    <div class="kpi-progress-fill" style="width: 82%; background: var(--blue-400);"></div>
+                </div>
+                <div class="kpi-subtext">
+                    <span>Ortalama Günlük Servis:</span>
+                    <strong style="color: #FFF;">320 - 350 Kadeh</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             3. SADELEŞTİRİLMİŞ SEKMELİ GEZİNME (TAB NAVIGATION)
+             Kullanıcıyı boğmayan, temiz ve odaklanmış modern mimari
+             ============================================================ -->
+        <nav class="main-tab-nav" aria-label="Modül Sekmeleri">
+            <button class="tab-nav-btn active" data-tab="tab-cocktails">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m19 3-7 8-7-8Z"/>
+                    <path d="M12 11v11"/>
+                    <path d="M8 22h8"/>
+                </svg>
+                1. Kokteyl &amp; Reçete Maliyetleri
+            </button>
+            <button class="tab-nav-btn" data-tab="tab-stock-waste">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <path d="M16 10a4 4 0 0 1-8 0"/>
+                </svg>
+                2. Şişe Stok &amp; Zayiat Takibi
+            </button>
+            <button class="tab-nav-btn" data-tab="tab-analytics">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"/>
+                    <path d="m19 9-5 5-4-4-3 3"/>
+                </svg>
+                3. Grafikler &amp; Fiyat Simülatörü
+            </button>
+            <button class="tab-nav-btn guide-tab-highlight" data-tab="tab-academy" id="tabNavAcademy">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
+                4. 🎓 Nasıl Kullanılır? (Öğretici Rehber)
+            </button>
+        </nav>
+
+        <!-- ============================================================
+             SEKME 1: KOKTEYL & REÇETE MALİYET HESAPLAYICI TABLOSU
+             ============================================================ -->
+        <div id="tab-cocktails" class="tab-content-panel active">
+            <section class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-header-title">
+                        <div class="panel-icon-wrap">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect width="18" height="18" x="3" y="3" rx="2"/>
+                                <path d="M3 9h18"/>
+                                <path d="M9 21V9"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2>Reçete &amp; Maliyet Hesaplama Tablosu (Cost Calculator)</h2>
+                            <p>Tüm kokteyllerin ml bazlı ana mal standardı, birim pour cost'u, satış fiyatı ve net marjı</p>
+                        </div>
+                    </div>
+                    <div class="panel-header-actions">
+                        <span style="font-size: 0.8rem; color: var(--gold-400); font-weight: 500; background: rgba(212, 175, 55, 0.08); padding: 5px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-gold);">
+                            💡 İpucu: Satış fiyatı kutularına tıklayıp yeni rakam yazarak kârınızı anında simüle edebilirsiniz.
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Table Filters & Search -->
+                <div class="table-toolbar">
+                    <div class="search-box-wrap">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input type="text" id="cocktailSearchInput" class="search-input" placeholder="Kokteyl, aroma veya kategori ara...">
+                    </div>
+
+                    <div class="filter-pills">
+                        <button class="filter-btn active" data-filter="all">Tüm Menü (6)</button>
+                        <button class="filter-btn" data-filter="signatures">İmza Kokteyller</button>
+                        <button class="filter-btn" data-filter="high-margin">Yüksek Kârlı (&ge;%82)</button>
+                        <button class="filter-btn" data-filter="low-cost">Düşük Maliyet (&le;%18)</button>
+                    </div>
+                </div>
+
+                <!-- Interactive Cost Table -->
+                <div class="table-responsive">
+                    <table class="luxury-table">
+                        <thead>
+                            <tr>
+                                <th>Kokteyl &amp; Profil</th>
+                                <th>Standart / Kadeh</th>
+                                <th>Birim Maliyet (Pour Cost)</th>
+                                <th>Menü Satış Fiyatı</th>
+                                <th>Net Kâr (Kadeh)</th>
+                                <th>Kâr Marjı %</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cocktailsTableBody">
+                            <!-- Populated dynamically via app.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============================================================
+             SEKME 2: ŞİŞE STOK & GÜNLÜK ZAYİAT TAKİP MODÜLÜ
+             ============================================================ -->
+        <div id="tab-stock-waste" class="tab-content-panel">
+            <section class="stock-waste-grid" style="margin-top: 0;">
+                <!-- Sol Kolon: Kritik & Aktif Şişe Stokları -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-header-title">
+                            <div class="panel-icon-wrap" style="color: var(--amber-400);">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+                                    <line x1="3" y1="6" x2="21" y2="6"/>
+                                    <path d="M16 10a4 4 0 0 1-8 0"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2>Bar Şişe Stok Seviyeleri &amp; Kritik Uyarılar</h2>
+                                <p>Tezgâh arkası açık şişe doluluk oranları ve yedek depo mevcudu</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stock-status-grid" id="stockStatusGrid">
+                        <!-- Populated dynamically via app.js -->
+                    </div>
+                </div>
+
+                <!-- Sağ Kolon: Günlük Zayiat / Kırık Giriş Formu ve Listesi -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-header-title">
+                            <div class="panel-icon-wrap" style="color: var(--rose-400);">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2>Günlük Zayiat &amp; Kırık Takip Modülü</h2>
+                                <p>Dökülen içki, kırılan kadeh ve reçete hatalarının maliyet kaydı</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="waste-container">
+                        <!-- Quick Waste Entry Form -->
+                        <form id="quickWasteForm" class="waste-form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="wasteItemSelect">Zayiat Olan Şişe / Kokteyl</label>
+                                <select id="wasteItemSelect" class="form-control" required>
+                                    <!-- Populated via JS -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="wasteAmountInput">Miktar</label>
+                                <input type="text" id="wasteAmountInput" class="form-control" placeholder="50 ml veya 1 şişe" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="wasteReasonSelect">Zayiat Nedeni</label>
+                                <select id="wasteReasonSelect" class="form-control">
+                                    <option value="Tezgâh Dökülmesi / Taşma">Tezgâh Dökülmesi / Taşma</option>
+                                    <option value="Kadeh Kırılması / Şişe Hasarı">Kadeh Kırılması / Şişe Hasarı</option>
+                                    <option value="Barmen Eğitimi & Tadım">Barmen Eğitimi &amp; Tadım</option>
+                                    <option value="Misafir İadesi / Hatalı Reçete">Misafir İadesi / Hatalı Reçete</option>
+                                    <option value="Asit / Gaz / Tazelik Kaybı">Asit / Gaz / Tazelik Kaybı</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-gold" style="height: 38px;">
+                                Kaydet
+                            </button>
+                        </form>
+
+                        <!-- Logged Wastes List -->
+                        <div>
+                            <div style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between;">
+                                <span>Bugünkü Zayiat Kayıtları</span>
+                                <span style="color: var(--gold-400);">Anlık Canlı Akış</span>
+                            </div>
+                            <div class="waste-log-list" id="wasteLogList">
+                                <!-- Populated dynamically via app.js -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============================================================
+             SEKME 3: GRAFİKLER & FİYAT SİMÜLATÖRÜ
+             ============================================================ -->
+        <div id="tab-analytics" class="tab-content-panel">
+            <section class="analytics-grid" style="margin-top: 0;">
+                <!-- Bar Chart: Cost vs Sales Price -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-header-title">
+                            <div class="panel-icon-wrap">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3v18h18"/>
+                                    <path d="m19 9-5 5-4-4-3 3"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2>Kokteyl Başı Maliyet ve Satış Fiyatı Dağılımı</h2>
+                                <p>Her bir kokteylin hammadde maliyeti (kırmızı) ile satış fiyatı (altın sarısı) oranı</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-card-body">
+                        <canvas id="cocktailCostChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Margin & Inflation Simulator -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-header-title">
+                            <div class="panel-icon-wrap" style="color: var(--emerald-400);">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+                                    <path d="M2 12h20"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2>Fiyat &amp; Maliyet Simülatörü</h2>
+                                <p>Olası kur/içki zamları ve menü fiyat ayarlamalarının kârlılık etkisi</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="simulator-body">
+                        <div class="sim-slider-group">
+                            <div class="sim-slider-header">
+                                <span style="color: var(--text-secondary);">Genel Menü Fiyat Değişimi:</span>
+                                <strong style="color: var(--gold-400);" id="simPriceLabel">0%</strong>
+                            </div>
+                            <input type="range" id="simPriceSlider" class="sim-slider" min="-20" max="40" value="0" step="5">
+                        </div>
+
+                        <div class="sim-slider-group">
+                            <div class="sim-slider-header">
+                                <span style="color: var(--text-secondary);">Alkol Hammadde Zam Oranı:</span>
+                                <strong style="color: var(--rose-400);" id="simCostLabel">0%</strong>
+                            </div>
+                            <input type="range" id="simCostSlider" class="sim-slider" min="0" max="50" value="0" step="5">
+                        </div>
+
+                        <div class="sim-results-card">
+                            <div>
+                                <div class="sim-metric-label">Yeni Simüle Cost %</div>
+                                <div class="sim-metric-val" id="simResultCost">%23.4</div>
+                            </div>
+                            <div>
+                                <div class="sim-metric-label">Tahmini Günlük Brüt Kâr</div>
+                                <div class="sim-metric-val" style="color: var(--emerald-400);" id="simResultProfit">112.500 ₺</div>
+                            </div>
+                        </div>
+
+                        <p style="font-size: 0.74rem; color: var(--text-muted); text-align: center;">
+                            * Simülasyon, günlük ortalama 340 kadeh kokteyl tüketim dağılımını baz alır.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============================================================
+             SEKME 4: 🎓 ÖĞRETİCİ ALAN & AKADEMİ REHBERİ (HOW TO USE)
+             Kullanıcıya sistemi adım adım öğreten interaktif merkez
+             ============================================================ -->
+        <div id="tab-academy" class="tab-content-panel">
+            <!-- Academy Hero Banner -->
+            <div class="academy-hero-card">
+                <div class="academy-hero-text">
+                    <span class="module-pill" style="margin-bottom: 8px; display: inline-block;">Lusso Bar Akademisi</span>
+                    <h2 class="serif-title gold-text-gradient">Bar Cost &amp; Operasyon Yönetimi Nasıl Yapılır?</h2>
+                    <p>
+                        Bu panel, barmenler ve restoran yöneticileri için karmaşık Excel tablolarını ortadan kaldırır. 
+                        Aşağıdaki 4 adımı takip ederek maliyetleri düşürebilir, döküm hatalarını engelleyebilir ve bar kârlılığını maksimum seviyeye çıkarabilirsiniz.
+                    </p>
+                </div>
+                <div>
+                    <button class="btn btn-gold" onclick="window.runGuidedDemo()">
+                        ✨ Örnek Rehber Turunu Başlat
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4 Interactive Step Cards -->
+            <div class="guide-steps-grid">
+                <!-- Adım 1 -->
+                <div class="guide-step-card">
+                    <div>
+                        <div class="step-badge">1</div>
+                        <h3 class="guide-step-title">Pour Cost &amp; Reçete Mantığı</h3>
+                        <p class="guide-step-desc">
+                            Her kokteylin ana alkolü (jigger ile 50ml), likörü, taze püresi ve garnitürü standarttır. 
+                            Birim maliyet, bu bileşenlerin toplam alış fiyatıdır.
+                        </p>
+                    </div>
+                    <button class="guide-try-btn" onclick="window.viewRecipeDetails('lusso-velvet-espresso')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        Espresso Reçetesini İncele
+                    </button>
+                </div>
+
+                <!-- Adım 2 -->
+                <div class="guide-step-card">
+                    <div>
+                        <div class="step-badge">2</div>
+                        <h3 class="guide-step-title">Fiyat Değiştirme &amp; Marj Hesabı</h3>
+                        <p class="guide-step-desc">
+                            Maliyet tablosundaki satış fiyatı kutularına tıklayıp yeni fiyat yazdığınızda, sistem kadeh başı net TL kârınızı ve % marjınızı anında hesaplar.
+                        </p>
+                    </div>
+                    <button class="guide-try-btn" onclick="window.demoPriceChange()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/></svg>
+                        Fiyat Değişimini Test Et
+                    </button>
+                </div>
+
+                <!-- Adım 3 -->
+                <div class="guide-step-card">
+                    <div>
+                        <div class="step-badge">3</div>
+                        <h3 class="guide-step-title">Zayiat (Dökülme/Kırık) Girişi</h3>
+                        <p class="guide-step-desc">
+                            Tezgâhta dökülen içki, kırılan kadeh veya barmen eğitim kayıplarını forma işleyin. Sistem bu kaybı anlık TL maliyetine çevirir ve KPI'a yansıtır.
+                        </p>
+                    </div>
+                    <button class="guide-try-btn" onclick="window.demoLogWaste()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                        Örnek Zayiat Kaydet
+                    </button>
+                </div>
+
+                <!-- Adım 4 -->
+                <div class="guide-step-card">
+                    <div>
+                        <div class="step-badge">4</div>
+                        <h3 class="guide-step-title">Kritik Stok &amp; Depo Transferi</h3>
+                        <p class="guide-step-desc">
+                            Şişe seviyesi %30'un altına inince 'Kritik Stok' yanar. Barmen tek tıkla `+1 Şişe Aç` diyerek yedek depodan yeni şişeyi tezgâha alır.
+                        </p>
+                    </div>
+                    <button class="guide-try-btn" onclick="window.demoStockAlert()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/></svg>
+                        Kritik Şişeyi Gör &amp; Aç
+                    </button>
+                </div>
+            </div>
+
+            <!-- Essential Formulas & Cheatsheet -->
+            <div class="panel-card" style="margin-bottom: 24px;">
+                <div class="panel-header">
+                    <div class="panel-header-title">
+                        <div class="panel-icon-wrap" style="color: var(--gold-400);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="16" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2>Bar Müdürü El Kitabı: Temel Formüller &amp; Altın Kurallar</h2>
+                            <p>Uluslararası lüks bar ve fine dining içecek maliyeti hesaplama standartları</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="formula-cards-grid" style="padding: 20px 24px;">
+                    <div class="formula-card">
+                        <div class="formula-title">Formül 1: İçecek Maliyeti (Cost %)</div>
+                        <div class="formula-equation">Cost % = (Birim Maliyet / Satış Fiyatı) × 100</div>
+                        <p class="formula-explain">
+                            Örnek: 80 ₺ maliyetli bir kokteyli 400 ₺'ye satıyorsanız Cost = %20, Net Kâr Marjınız = %80'dir. Lusso Bistro için ideal aralık <strong>%20 - %25</strong> arasıdır.
+                        </p>
+                    </div>
+
+                    <div class="formula-card">
+                        <div class="formula-title">Formül 2: Standart Şişe Porsiyonu</div>
+                        <div class="formula-equation">700 ml Şişe ÷ 50 ml Jigger = 14 Porsiyon</div>
+                        <p class="formula-explain">
+                            Standart bir 70cl şişeden firesiz 14 kadeh çıkar. Barmen her kadehe 5ml fazla dökerse şişe başına 1 tam kadeh (≈ 400 ₺ ciro) havaya uçar!
+                        </p>
+                    </div>
+
+                    <div class="formula-card">
+                        <div class="formula-title">Formül 3: Zayiat Oranı &amp; Eşiği</div>
+                        <div class="formula-equation">Zayiat % = (Toplam Zayiat ₺ / Günlük Ciro ₺) × 100</div>
+                        <p class="formula-explain">
+                            Zayiat oranı <strong>%1.5 altında</strong> ise bar ekibi harika döküm ve bulaşık disiplinine sahiptir. %2.5 üzerine çıkarsa tezgah denetlenmelidir.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Frequently Asked Questions -->
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-header-title">
+                        <div class="panel-icon-wrap" style="color: var(--emerald-400);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2>Sıkça Sorulan Sorular (SSS)</h2>
+                            <p>Sistem işleyişi hakkında barmen ve yöneticilerden gelen sorular</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-grid" style="padding: 20px 24px;">
+                    <div class="faq-card">
+                        <h4 class="faq-question">
+                            <span style="color: var(--gold-400);">Q:</span> Satış fiyatını veya zayiatı girdiğimde kaydediliyor mu?
+                        </h4>
+                        <p class="faq-answer">
+                            Evet. Yaptığınız tüm fiyat değişiklikleri, yeni eklenen kokteyller ve zayiat kayıtları tarayıcınızın güvenli yerel hafızasında (LocalStorage) anında saklanır; sayfayı yenileseniz bile kaybolmaz.
+                        </p>
+                    </div>
+
+                    <div class="faq-card">
+                        <h4 class="faq-question">
+                            <span style="color: var(--gold-400);">Q:</span> Fabrika ayarlarına veya orijinal menüye nasıl dönebilirim?
+                        </h4>
+                        <p class="faq-answer">
+                            Sayfanın en altındaki footer alanında bulunan <strong>'🔄 Fabrika Ayarlarına Sıfırla'</strong> butonuna tıklayarak Lusso'nun varsayılan 6 kokteyl ve başlangıç stoklarına anında geri dönebilirsiniz.
+                        </p>
+                    </div>
+
+                    <div class="faq-card">
+                        <h4 class="faq-question">
+                            <span style="color: var(--gold-400);">Q:</span> Zayiat kaydı girdiğimde ne olur?
+                        </h4>
+                        <p class="faq-answer">
+                            Girdiğiniz içkinin (örneğin Tanqueray Gin) ml maliyeti otomatik hesaplanır, 'Günlük Tahmini Zayiat Oranı' KPI'ınıza yansıtılır ve ilgili şişenin tezgah doluluk miktarı düşürülür.
+                        </p>
+                    </div>
+
+                    <div class="faq-card">
+                        <h4 class="faq-question">
+                            <span style="color: var(--gold-400);">Q:</span> Bu panel mobil cihazlardan veya bardaki tabletten kullanılır mı?
+                        </h4>
+                        <p class="faq-answer">
+                            Tamamen uyumludur. iPad, Android tablet veya telefon ekranlarında dokunmatik butonlar ve kaydırılabilir tablolar ile bir POS terminali gibi kusursuz çalışır.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             6. FOOTER
+             ============================================================ -->
+        <footer class="main-footer">
+            <div class="footer-left">
+                <span class="footer-gold-dot"></span>
+                <span><strong>Lusso Bistro &amp; Bar</strong> • Bar Management &amp; Pour Cost Intelligence System</span>
+            </div>
+            <div style="display: flex; gap: 16px; align-items: center;">
+                <button class="btn btn-secondary" id="btnResetData" style="font-size: 0.74rem; padding: 5px 10px;">
+                    🔄 Fabrika Ayarlarına Sıfırla
+                </button>
+                <span>Sürüm 2.5 Luxury Edition • Sadeleştirilmiş Arayüz</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ============================================================
+         MODAL 1: RECIPE & INGREDIENT DETAILS MODAL
+         ============================================================ -->
+    <div class="modal-overlay" id="recipeModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="recipeModalTitle" class="serif-title gold-text-gradient">Kokteyl Reçetesi &amp; Standartları</h3>
+                <button class="btn-close-modal" onclick="window.closeModal('recipeModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="recipeModalBody">
+                <!-- Injected via JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="window.closeModal('recipeModal')">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MODAL 2: ADD NEW COCKTAIL / RECIPE MODAL
+         ============================================================ -->
+    <div class="modal-overlay" id="addCocktailModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="serif-title gold-text-gradient">Yeni İmza Kokteyl / Reçete Ekle</h3>
+                <button class="btn-close-modal" onclick="window.closeModal('addCocktailModal')">&times;</button>
+            </div>
+            <form id="newCocktailForm">
+                <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label" for="newCocktailName">Kokteyl Adı</label>
+                            <input type="text" id="newCocktailName" class="form-control" placeholder="Örn. Lusso Golden Negroni" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newCocktailCategory">Kategori</label>
+                            <select id="newCocktailCategory" class="form-control">
+                                <option value="İmza Kokteyller">İmza Kokteyller</option>
+                                <option value="Klasik & Twist">Klasik &amp; Twist</option>
+                                <option value="Ekşi & Meyveli">Ekşi &amp; Meyveli</option>
+                                <option value="Tatlı & Digestif">Tatlı &amp; Digestif</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label" for="newCocktailGlass">Kadeh Tipi</label>
+                            <input type="text" id="newCocktailGlass" class="form-control" placeholder="Örn. Coupe / Rocks Glass">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newCocktailGarnish">Garnitür Standardı</label>
+                            <input type="text" id="newCocktailGarnish" class="form-control" placeholder="Örn. Portakal Kabuğu & Altın Tozu">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label" for="newCocktailSalesPrice">Satış Fiyatı (₺)</label>
+                            <input type="number" id="newCocktailSalesPrice" class="form-control" placeholder="Örn. 450" min="50" step="10" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="newCocktailManualCost">Tahmini Toplam Maliyet (₺)</label>
+                            <input type="number" id="newCocktailManualCost" class="form-control" placeholder="Aşağıdan reçete oluşturabilir veya buraya yazabilirsiniz" step="0.5">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <label class="form-label" style="margin-bottom: 0;">Reçete Malzemeleri (Opsiyonel Detay)</label>
+                            <button type="button" class="btn btn-secondary" id="btnAddIngredientRow" style="font-size: 0.72rem; padding: 3px 8px;">
+                                + Malzeme Ekle
+                            </button>
+                        </div>
+                        <div id="dynamicIngredientsList">
+                            <!-- Dynamic ingredient rows will appear here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="window.closeModal('addCocktailModal')">Vazgeç</button>
+                    <button type="submit" class="btn btn-gold">Kokteyli Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Application Script -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
